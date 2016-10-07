@@ -150,7 +150,7 @@ function refreshSlideTable(){
 		$('#table').append(
 			"<tr><td><img onclick='goToView(" + slidesArr[i].time + ", " + slidesArr[i].slideNum + ");' src='https://speakerd.s3.amazonaws.com/presentations/" 
 				+ $('#slideId').val() + "/thumb_slide_" + zIndex
-				+".jpg'><td><td><button type='button' class='btn btn-info btn-sm highlight glyphicon glyphicon-link cp'  data-clipboard-text='[(" + time 
+				+".jpg' onerror=\"this.src=''\"><td><td><button type='button' class='btn btn-info btn-sm highlight glyphicon glyphicon-link cp'  data-clipboard-text='[(" + time 
 				+ ")](javascript:presentz.changeChapter(0," + zIndex 
 				+ ",true);)'></button></td><td><div class='right-inner-addon'><i class='icon-search hidden_edit'></i><input class='simplebox' value='" 
 				+ slidesArr[i].slideNum + "'/></div></td><td>" + time + "</td></tr>"
