@@ -63,7 +63,7 @@ function addSlideObj(){
 	}
 
    var source = {
-				"time" : Math.trunc(document.getElementById("video").currentTime),
+				"time" : Math.round(videoController.getCurTime()),
 				"slideNum" : slideNum
 			 };
 	slidesArr.push(source);
@@ -192,6 +192,7 @@ function changeVideo(){
    	video.load();
 
 	}*/
+
 	videoController.changeVideo(newUrl);
 }
 
@@ -229,10 +230,11 @@ function keypressed(event){
         keycode = event.which;
 
    if(keycode === keyConfig.recordTime){
-
-   	addSlideObj();
-   	updateSlideUI();
-   	refreshSlideTable();
+   	if(videoController.isReady()){
+	   	addSlideObj();
+	   	updateSlideUI();
+	   	refreshSlideTable();
+	   }
 
    } else if(keycode === keyConfig.removeLast){
 
@@ -241,11 +243,10 @@ function keypressed(event){
 
    } else if(keycode === keyConfig.playPause){
 
-   	var video = document.getElementById("video");
-   	if(video.paused){
-   		video.play();
+   	if(videoController.isPaused()){
+   		videoController.play();
    	} else {
-   		video.pause();
+   		videoController.pause();
    	}
    	if(keycode === 32){
    		event.preventDefault();
@@ -281,12 +282,6 @@ function slideLoadHandler() {
 
 }
 
-function callback(json){
-        console.log("OMG WE GOT A RESPONSE");
-	console.log((json));
-      $("#video_container").html(json.html);
-}
-
 function init()
 {
 	console.log(window);
@@ -298,6 +293,6 @@ function init()
 
    videoController = new VideoController('video', window);
    
-
+   console.log("video controller set");
 }
 

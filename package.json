@@ -1,0 +1,22 @@
+{
+  "name": "realmtranscribe",
+  "version": "0.0.1",
+  "description": "a tool to aid in the transcription process for realm transcribers",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/athattayathu/transcription.git"
+  },
+  "author": "athattayathu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/athattayathu/transcription/issues"
+  },
+  "homepage": "https://github.com/athattayathu/transcription#readme",
+  "dependencies": {
+    "express": "^4.14.0"
+  }
+}
