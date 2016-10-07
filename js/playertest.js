@@ -31,6 +31,8 @@ var slidesArr = [];
 
 var slideController;
 
+var videoController;
+
 var clipbrd;
 
 function generateSlideJSON(){
@@ -178,7 +180,7 @@ function changeName(){
 function changeVideo(){
 	
 	var newUrl = $("#videoUrl").val();
-	if(newUrl !== obj.chapters[0].video.url){
+	/*if(newUrl !== obj.chapters[0].video.url){
 
 		obj.chapters[0].video.url = newUrl;
 		document.getElementById("dasource").setAttribute('src', newUrl);
@@ -189,7 +191,8 @@ function changeVideo(){
 
    	video.load();
 
-	}
+	}*/
+	videoController.changeVideo(newUrl);
 }
 
 function changeSlide(){
@@ -279,7 +282,9 @@ function slideLoadHandler() {
 }
 
 function callback(json){
-	console.log(json);
+        console.log("OMG WE GOT A RESPONSE");
+	console.log((json));
+      $("#video_container").html(json.html);
 }
 
 function init()
@@ -291,21 +296,8 @@ function init()
    $(document).keydown(keypressed);
    clipbrd = new Clipboard('.cp');
 
-	$.ajax({
-		type:"GET",
-	  	url:'http://speakerdeck.com/oembed.json?url=https%3A%2F%2Fspeakerdeck.com%2Frealm%2Fscott-gardner-reactive-programming-with-rxswift',
-	  	dataType:'jsonp',
-	  	jsonpCallback:'callback',
-	  	success: callback
-	});
-
-	$.ajax({
-		type:"GET",
-	  	url:'http://fast.wistia.com/oembed?url='+Utility.fixedEncodeURI('https://realm.wistia.com/medias/zl8kec212v'),
-	  	dataType:'jsonp',
-	  	jsonpCallback:'callback',
-	  	success: callback
-	});
+   videoController = new VideoController('video', window);
+   
 
 }
 
