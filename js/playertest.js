@@ -204,12 +204,9 @@ function changeSlide(){
 
 }
 
-function videoSeekTo(time){
-	document.getElementById("video").currentTime = time;
-}
 
 function goToView(videoTime, slideNum){
-	videoSeekTo(videoTime);
+	videoController.goToTime(videoTime);
 	slideController.goToSlide(slideNum);
 	$('#slideNum').text(slideController.getCurrentSlide());
 }
@@ -254,10 +251,10 @@ function keypressed(event){
 
    } else if(keycode === keyConfig.rewind){
 
-   	document.getElementById("video").currentTime -= 1;
+   	videoController.goToTime(videoController.getCurTime() - 1);
 
    } else if(keycode === keyConfig.forward){
-   	document.getElementById("video").currentTime += 1;
+   	videoController.goToTime(videoController.getCurTime() + 1);
 
    } else if(keycode === keyConfig.slideAdvance){
    	if(slideController){
