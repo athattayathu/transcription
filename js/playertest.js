@@ -1,6 +1,3 @@
-//oembed: because holy shit
-
-
 var obj = {
 		  "title": "",
 		  "chapters": [
@@ -47,14 +44,10 @@ function generateSlideJSON(){
 	}
 
 	obj.chapters[0].slides = storeArr;
+	obj.chapters[0].duration = videoController.getTotalDuration();
 }
 
-function updateMetadata(){
-	changeName();
-	changeVideo();
-	changeSlide();
-	$('#myModal').modal('hide');
-}
+
 
 function addSlideObj(){
 	var slideNum = 1;
@@ -127,23 +120,36 @@ function _deconstructSlides(slides){
 	return returnArr;
 }
 
-function refreshSlideTable(){
+/**
+ * Create a string of the format hh:mm:ss or mm:ss from time in seconds passed in
+ **/
+function timeToStr(time){
 
 	const MINUTE_TO_SECOND = 60;
 	const HOUR_TO_SECOND = 3600;
 
+	var hour = Math.trunc(time /HOUR_TO_SECOND);
+
+	var minute = Math.trunc(time / MINUTE_TO_SECOND);
+	var seconds = time % MINUTE_TO_SECOND;
+	seconds = (seconds < 10)? '0' + seconds : seconds;
+
+	var res =  minute + ':' + seconds ;
+	res = (hour) ? (hour+":"+time) : time;
+
+	return res;
+}
+
+
+function refreshSlideTable(){
+
+
 	$("#table tbody tr").remove();
 
 	for (var i = 0; i < slidesArr.length; i++) {
-		var hour = Math.trunc(slidesArr[i].time/HOUR_TO_SECOND);
+	
+		var time = timeToStr(slidesArr[i].time);
 
-		var minute = Math.trunc(slidesArr[i].time / MINUTE_TO_SECOND);
-		var seconds = slidesArr[i].time % MINUTE_TO_SECOND;
-		seconds = (seconds < 10)? '0' + seconds : seconds;
-
-		var time =  minute + ':' + seconds ;
-		time = (hour) ? (hour+":"+time) : time;
-		console.log(time);
 		var zIndex = slidesArr[i].slideNum - 1;
 		$('#table').append(
 			"<tr><td><img onclick='goToView(" + slidesArr[i].time + ", " + slidesArr[i].slideNum + ");' src='https://speakerd.s3.amazonaws.com/presentations/" 
@@ -155,13 +161,31 @@ function refreshSlideTable(){
 				+ slidesArr[i].slideNum + "'/></div></td><td>" + time + "</td></tr>"
 	   );
 	};
+	
 	$('input').change(function(e){
 		var target = $(e.target);
 		var index = target.data("index");
 		slidesArr[index].slideNum = parseInt(target.val());
 	});
+
 	$('#scrollPane').scrollTop($('#scrollPane').prop("scrollHeight"));
 
+}
+
+function updateMetadata(){
+	try{
+		changeVideo();
+		changeSlide();
+		changeName();
+		$('#myModal').modal('hide');
+	} catch (e) {
+		if(e instanceof ControllerError) {
+			console.log(e.message);
+		}
+		else{
+			throw e;
+		}
+	}
 }
 
 function updateSlideUI(){
@@ -182,22 +206,20 @@ function changeName(){
 }
 
 function changeVideo(){
-	
-	var newUrl = $("#videoUrl").val();
-	/*if(newUrl !== obj.chapters[0].video.url){
-
-		obj.chapters[0].video.url = newUrl;
-		document.getElementById("dasource").setAttribute('src', newUrl);
-   	
-   	video.addEventListener('durationchange', function() {
-		    obj.chapters[0].duration = Math.trunc(video.duration);
-		});
-
-   	video.load();
-
-	}*/
-
-	videoController.changeVideo(newUrl);
+	var httpreg = /https?:\/\//;
+	var jqUrl = $("#videoUrl");
+	var newUrl = jqUrl.val();
+	if(!httpreg.exec(newUrl)){
+		newUrl = "https://" + newUrl;
+		jqUrl.val(newUrl);
+	}
+	try{
+		videoController.changeVideo(newUrl);
+		jqUrl.parent().removeClass("has-error", "has-feedback");
+	} catch (e){
+		jqUrl.parent().addClass("has-error", "has-feedback");
+		throw e;
+	}
 }
 
 function changeSlide(){
@@ -285,7 +307,6 @@ function slideLoadHandler() {
 
 function init()
 {
-	console.log(window);
    var video = document.getElementById("video");
 
    $(document).unbind('keydown');//removes any previous handlers left over after refresh
@@ -293,7 +314,6 @@ function init()
    clipbrd = new Clipboard('.cp');
 
    videoController = new VideoController('video', window);
-   
-   console.log("video controller set");
+ 
 }
 
