@@ -121,8 +121,6 @@ function _deconstructSlides(slides){
 				"time" : slide.time,
 				"slideNum" : parseInt(slide.url.slice(numLoc),10)
 			};
-		console.log(slide.url.search(/#\d+/i));
-		console.log(slide.url.slice(numLoc));
 
 		returnArr.push(val);
 	}
@@ -150,12 +148,18 @@ function refreshSlideTable(){
 		$('#table').append(
 			"<tr><td><img onclick='goToView(" + slidesArr[i].time + ", " + slidesArr[i].slideNum + ");' src='https://speakerd.s3.amazonaws.com/presentations/" 
 				+ $('#slideId').val() + "/thumb_slide_" + zIndex
-				+".jpg' onerror=\"this.src=''\"><td><td><button type='button' class='btn btn-info btn-sm highlight glyphicon glyphicon-link cp'  data-clipboard-text='[(" + time 
+				+ ".jpg' onerror=\"this.src=''\"><td><td><button type='button' class='btn btn-info btn-sm highlight glyphicon glyphicon-link cp'  data-clipboard-text='[(" + time 
 				+ ")](javascript:presentz.changeChapter(0," + zIndex 
-				+ ",true);)'></button></td><td><div class='right-inner-addon'><i class='icon-search hidden_edit'></i><input class='simplebox' value='" 
+				+ ",true);)'></button></td><td><div class='right-inner-addon'><i class='icon-search hidden_edit'></i><input data-index="
+				+ zIndex + " pattern= '[0-9]' class='simplebox' value='" 
 				+ slidesArr[i].slideNum + "'/></div></td><td>" + time + "</td></tr>"
 	   );
 	};
+	$('input').change(function(e){
+		var target = $(e.target);
+		var index = target.data("index");
+		slidesArr[index].slideNum = parseInt(target.val());
+	});
 	$('#scrollPane').scrollTop($('#scrollPane').prop("scrollHeight"));
 
 }

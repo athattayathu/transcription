@@ -26,8 +26,8 @@ class SlideController {
 
 		this.slidesIframe.setAttribute("src", 'https://speakerdeck.com/player/'+slideDeckUrl);
 
-		this.window.removeEventListener('message', this.receiver);
-		this.window.addEventListener('message', this.receiver, false);
+		//this.window.removeEventListener('message', this.receiver);
+		//this.window.addEventListener('message', this.receiver, false);
 		this.slidesIframe.contentWindow.postMessage(JSON.stringify(["ping"]), "*");
 
 	}
@@ -92,7 +92,7 @@ class SlideController {
 		}
 	}
 
-	receiver(event) {
+	/*receiver(event) {
 
 	   if (!event.origin.startsWith('https:speakerdeck.com/player/')) {
 	   	console.log(event);
@@ -112,7 +112,7 @@ class SlideController {
 	   	this.currentSlide = data[1].number;
 	   }
 
-	}
+	}*/
 
 	getCurrentSlide(){
 		return this.currentSlide;
