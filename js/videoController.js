@@ -18,7 +18,7 @@ class VideoController {
 		window._wq = window._wq || [];
 		_wq.push({ id: "_all", onReady: function(videoReturn) {
 			ogClass.video = videoReturn;
-			ogClass.duration = videoReturn.duration();
+			ogClass.duration = Math.trunc(videoReturn.duration());
 		}});
 
 
@@ -108,7 +108,7 @@ class VideoController {
 	}
 
 	isReady(){
-		return (this.video !== undefined && video.hasData());
+		return (this.video !== undefined && this.video.hasData());
 	}
 
 }

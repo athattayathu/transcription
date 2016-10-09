@@ -135,8 +135,9 @@ function timeToStr(time){
 	seconds = (seconds < 10)? '0' + seconds : seconds;
 
 	var res =  minute + ':' + seconds ;
-	res = (hour) ? (hour+":"+time) : time;
-
+	res = (hour) ? (hour+":"+res) : res;
+        console.log(time);
+	console.log(res);
 	return res;
 }
 
@@ -277,10 +278,10 @@ function keypressed(event){
 
    } else if(keycode === keyConfig.rewind){
 
-   	videoController.goToTime(videoController.getCurTime() - 1);
+   	videoController.goToTime(videoController.getCurTime() - 2);
 
    } else if(keycode === keyConfig.forward){
-   	videoController.goToTime(videoController.getCurTime() + 1);
+   	videoController.goToTime(videoController.getCurTime() + 2);
 
    } else if(keycode === keyConfig.slideAdvance){
    	if(slideController){
