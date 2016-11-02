@@ -63,7 +63,7 @@ function addSlideObj(){
 
 }
 
-function updateData(){
+function uploadData(){
 	//parse data
 	var jsonData = '';
 	try{
@@ -76,12 +76,20 @@ function updateData(){
 	var arr;
 	var slideId;
 	try {
+
 		arr = _deconstructSlides(jsonData.chapters[0].slides);
-		if(jsonData.chapters[0].slides[0]){
-			var url = jsonData.chapters[0].slides[0].url;
-			url = url.replace("https://speakerdeck.com/","");
-			slideId = url.replace(/#\d+/i, "");
-			$('#slideId').val(slideId);
+
+		var chapterOne = jsonData.chapters[0];
+		if(chapterOne){
+			$('#videoUrl').val(chapterOne.video.url);
+			$('#title').val(chapterOne.video.title);
+			if(chapterOne.slides[0]) {
+				var url = chapterOne.slides[0].url;
+
+				url = url.replace("https://speakerdeck.com/","");
+				slideId = url.replace(/#\d+/i, "");
+				$('#slideId').val(slideId);
+			}
 		}
 	} catch (e){
 		console.log(e);
@@ -95,7 +103,19 @@ function updateData(){
 	// update UI Metadata
 	//update UI slides
 
-	updateMetadata();
+	try{
+		changeVideo();
+	} catch (e){
+		if(e instanceof ControllerError) {
+			console.log(e.message);
+		}
+		else{
+			throw e;
+		}
+
+	}
+	changeSlide();
+	changeName();
 	updateSlideUI();
 	refreshSlideTable();
 }
@@ -302,7 +322,7 @@ function slideLoadHandler() {
 
 	var slideFrame = document.getElementById("slideSet");
 
-   slideController = new SlideController(slideFrame, window);
+   slideController = new SlideController("slideContainer" , slideFrame, window);
 
 }
 
