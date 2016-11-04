@@ -29,7 +29,7 @@ class VideoController {
 		return this.videoUrl;
 	}
 
-	changeVideo(url){
+	changeVideo(url, onErrorFunc, onSuccessFunc){
 		if (typeof url !== 'string'){
 			throw new TypeError("Need a string as the url");
 		}
@@ -40,25 +40,35 @@ class VideoController {
 			return;
 		}
 
-		this._getVideo(url);
+		this._getVideo(url, onErrorFunc, onSuccessFunc);
 		this.videoUrl = url;
 	}
 
 
 
-	_getVideo(url){
+	_getVideo(url, onErrorFunc, onSuccessFunc){
 		$.ajax({
 			type:"GET",
 		  	url:'http://fast.wistia.com/oembed?url='+Utility.fixedEncodeURI(url),
 		  	dataType:'jsonp',
-		  	complete: this._replaceVideoFrame()
+		  	complete: this._replaceVideoFrame(onErrorFunc, onSuccessFunc)
 		});
 	}
 
-	_replaceVideoFrame(){
+	_replaceVideoFrame(onErrorFunc, onSuccessFunc){
 		var videoId = this._videoId;
-		return function(data){
+		return function(data, status){
+			//if its an error execute error callback
+			if(status !== "notmodified" && status !== "success"){
+				if (onErrorFunc) {
+					onErrorFunc();
+				}
+				return;
+			}
 			$('#' + videoId).html(data.responseJSON.html);
+			if(onSuccessFunc){
+				onSuccessFunc();
+			}
 		};
 		//this.videoDiv.html(data.responseJSON.html);
 

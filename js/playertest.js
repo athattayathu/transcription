@@ -30,6 +30,8 @@ var slideController;
 
 var videoController;
 
+var notificationHandler;
+
 var clipbrd;
 
 var FTU = true;
@@ -155,7 +157,6 @@ function refreshSlideTable(){
 
 	var specUrl = slideController.getSlideSpecificUrl();
 	specUrl = "https://speakerd.s3.amazonaws.com/presentations/" + specUrl.substr(specUrl.indexOf("player/") + 7);
-	console.error("specUrl :"+ specUrl);
 	for (var i = 0; i < slidesArr.length; i++) {
 	
 		var time = Utility.timeToStr(slidesArr[i].time);
@@ -226,8 +227,11 @@ function changeVideo(){
 	newUrl = Utility.prependHttps(jqUrl.val());
 
 	jqUrl.val(newUrl);
+	var onerror = function(message){
+								notificationHandler.notifyError("Could not get the video. <a onclick=\"$('#vidInfoModal').modal('show');\">Try changing the Url.</a>");
+							}
 	try{
-		videoController.changeVideo(newUrl);
+		videoController.changeVideo(newUrl, onerror);
 		jqUrl.parent().removeClass("has-error", "has-feedback");
 	} catch (e){
 		jqUrl.parent().addClass("has-error", "has-feedback");
@@ -238,9 +242,11 @@ function changeVideo(){
 function changeSlide(){
 	var jqUrl = $('#slideId');
 	var slideUrl = Utility.prependHttps(jqUrl.val());
-	
+	var onerror = function(message){
+								notificationHandler.notifyError("Could not get the slides. <a onclick=\"$('#vidInfoModal').modal('show');\">Try changing the Url.</a>");
+							}
 	try{
-		slideController.changeDeck(slideUrl);
+		slideController.changeDeck(slideUrl, onerror);
 		jqUrl.parent().removeClass("has-error", "has-feedback");
 	} catch (e){
 		jqUrl.parent().addClass("has-error", "has-feedback");
@@ -267,7 +273,6 @@ function recordTime(){
 }
 
 function keypressed(event){
-
 	if ($(event.target).is('input, textarea')) {
 	// check to make sure the keypresses are not originating from a text area
      	return;   
@@ -336,6 +341,7 @@ function init()
 
    videoController = new VideoController('video', window);
    slideController = new SlideController("slideSet", window);
+   notificationHandler = new NotificationHandler();
  
 }
 

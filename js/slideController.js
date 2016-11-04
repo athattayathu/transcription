@@ -1,6 +1,6 @@
 class SlideController {
 
-	constructor(slideContrainer,window){
+	constructor(slideContainer,window){
 
 		this.slidesIframe;
 
@@ -14,7 +14,7 @@ class SlideController {
 
 		this.slideSpecificUrl = "";
 
-		this.slideContrainer = slideContrainer
+		this.slideContainer = slideContainer
 
 		this.reg = /http(s)?:\/\/speakerdeck.com\/realm\//
 		
@@ -36,7 +36,7 @@ class SlideController {
 	* This function changes the slide Deck to the given Url
 	* @param slideDeckUrl string from https://speakerdeck.com/realm/
 	*/
-	changeDeck(slideDeckUrl){
+	changeDeck(slideDeckUrl, onErrorFunc, onSuccessFunc){
 
 		if (typeof slideDeckUrl !== 'string'){
 			throw new TypeError("Need a string as the url");
@@ -49,7 +49,7 @@ class SlideController {
 			return;
 		}
 
-		this._getSlideData(slideDeckUrl);
+		this._getSlideData(slideDeckUrl, onErrorFunc, onSuccessFunc);
 		this.slideDeckUrl = slideDeckUrl;
 		this.currentSlide = 1;
 		this.slideDeckOrigin = "";
@@ -61,9 +61,8 @@ class SlideController {
 
 	}
 
-	_getSlideData(slideDeckUrl){
-		console.log("started getting slides");
-				$.ajax({
+	_getSlideData(slideDeckUrl, onErrorFunc, onSuccessFunc){
+		$.ajax({
 			type:"GET",
 		  	url:"https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D'" 
 		  		+ Utility.fixedEncodeURI("https://speakerdeck.com/oembed.json?url=" 
@@ -71,15 +70,22 @@ class SlideController {
 		  		)
 		  		+ "'&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys",
 		  	dataType:'jsonp',
-		  	complete: this._slideCallback()
+		  	complete: this._slideCallback(onErrorFunc, onSuccessFunc)
 		});
 	}
 
-	_slideCallback(){
-		var container = this.slideContrainer;
+	_slideCallback(onErrorFunc, onSuccessFunc){
+		var container = this.slideContainer;
 		var self = this;
-		
-		return function(data){
+		return function(data, status) {
+			//if its an error execute error callback
+			if(status !== "notmodified" && status !== "success"){
+				if (onErrorFunc) {
+					onErrorFunc();
+				}
+				return;
+			}
+
 			//replace contents to have the iframe
 			var res = JSON.parse(data.responseJSON.query.results.body);
 			$('#'+container).html(res.html);
@@ -92,7 +98,9 @@ class SlideController {
 
 			//get hold of details of slides
 			self.slidesIframe.contentWindow.postMessage(JSON.stringify(["ping"]), "*");
-			console.log("Message should be posted");
+			if (onSuccessFunc) {
+				onSuccessFunc();
+			}
 		}
 	}
 
