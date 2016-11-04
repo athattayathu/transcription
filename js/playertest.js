@@ -173,7 +173,7 @@ function refreshSlideTable(){
 	   );
 	};
 	
-	$('input').change(function(e){
+	$('#table > input').change(function(e){
 		var target = $(e.target);
 		var index = target.data("index");
 		slidesArr[index].slideNum = parseInt(target.val());

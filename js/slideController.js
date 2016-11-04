@@ -79,7 +79,7 @@ class SlideController {
 		var self = this;
 		return function(data, status) {
 			//if its an error execute error callback
-			if(status !== "notmodified" && status !== "success"){
+			if((status !== "notmodified" && status !== "success") || (null == data.responseJSON.query.results)){
 				if (onErrorFunc) {
 					onErrorFunc();
 				}
