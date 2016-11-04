@@ -47,12 +47,19 @@ class VideoController {
 
 
 	_getVideo(url, onErrorFunc, onSuccessFunc){
-		$.ajax({
-			type:"GET",
-		  	url:'http://fast.wistia.com/oembed?url='+Utility.fixedEncodeURI(url),
-		  	dataType:'jsonp',
-		  	complete: this._replaceVideoFrame(onErrorFunc, onSuccessFunc)
-		});
+		try {
+			$.ajax({
+				type:"GET",
+			  	url:'http://fast.wistia.com/oembed?url='+Utility.fixedEncodeURI(url),
+			  	dataType:'jsonp',
+			  	complete: this._replaceVideoFrame(onErrorFunc, onSuccessFunc),
+			  	error: function(xhr, status, error) {
+			  		console.log("Got the error result");
+			  	}
+			});
+		} catch (e){
+			console.log("OMG GOT ERROR ON TRY CACTH");
+		}
 	}
 
 	_replaceVideoFrame(onErrorFunc, onSuccessFunc){

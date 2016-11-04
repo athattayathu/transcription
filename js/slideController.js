@@ -62,16 +62,18 @@ class SlideController {
 	}
 
 	_getSlideData(slideDeckUrl, onErrorFunc, onSuccessFunc){
-		$.ajax({
-			type:"GET",
-		  	url:"https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D'" 
-		  		+ Utility.fixedEncodeURI("https://speakerdeck.com/oembed.json?url=" 
-		  			+ Utility.fixedEncodeURI(slideDeckUrl)
-		  		)
-		  		+ "'&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys",
-		  	dataType:'jsonp',
-		  	complete: this._slideCallback(onErrorFunc, onSuccessFunc)
-		});
+
+			$.ajax({
+				type:"GET",
+			  	url:"https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D'" 
+			  		+ Utility.fixedEncodeURI("https://speakerdeck.com/oembed.json?url=" 
+			  			+ Utility.fixedEncodeURI(slideDeckUrl)
+			  		)
+			  		+ "'&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys",
+			  	dataType:'jsonp',
+			  	complete: this._slideCallback(onErrorFunc, onSuccessFunc)
+			});
+
 	}
 
 	_slideCallback(onErrorFunc, onSuccessFunc){
