@@ -157,14 +157,17 @@ function refreshSlideTable(){
 
 	$("#table tbody tr").remove();
 
+	var specUrl = slideController.getSlideSpecificUrl();
+	specUrl = "https://speakerd.s3.amazonaws.com/presentations/" + specUrl.substr(specUrl.indexOf("player/") + 5);
+	console.error("specUrl :"+ specUrl);
 	for (var i = 0; i < slidesArr.length; i++) {
 	
 		var time = Utility.timeToStr(slidesArr[i].time);
 
 		var zIndex = slidesArr[i].slideNum - 1;
 		$('#table').append(
-			"<tr><td><img onclick='goToView(" + slidesArr[i].time + ", " + slidesArr[i].slideNum + ");' src='https://speakerd.s3.amazonaws.com/presentations/" 
-				+ $('#slideId').val() + "/thumb_slide_" + zIndex
+			"<tr><td><img onclick='goToView(" + slidesArr[i].time + ", " + slidesArr[i].slideNum + ");' src='" 
+				+ specUrl + "/thumb_slide_" + zIndex
 				+ ".jpg' onerror=\"this.src=''\"><td><td><button type='button' class='btn btn-info btn-sm highlight glyphicon glyphicon-link cp'  data-clipboard-text='[(" + time 
 				+ ")](javascript:presentz.changeChapter(0," + zIndex 
 				+ ",true);)'></button></td><td><div class='right-inner-addon'><i class='icon-search hidden_edit'></i><input data-index="
@@ -226,7 +229,6 @@ function changeVideo(){
 	
 	newUrl = Utility.prependHttps(jqUrl.val());
 
-	console.log(newUrl);
 	jqUrl.val(newUrl);
 	try{
 		videoController.changeVideo(newUrl);
