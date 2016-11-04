@@ -52,6 +52,7 @@ class VideoController {
 				type:"GET",
 			  	url:'http://fast.wistia.com/oembed?url='+Utility.fixedEncodeURI(url),
 			  	dataType:'jsonp',
+			  	timeout: 5000,
 			  	complete: this._replaceVideoFrame(onErrorFunc, onSuccessFunc),
 			  	error: function(xhr, status, error) {
 			  		console.log("Got the error result");
@@ -60,6 +61,8 @@ class VideoController {
 		} catch (e){
 			console.log("OMG GOT ERROR ON TRY CACTH");
 		}
+
+		//$.getJSON('http://fast.wistia.com/oembed?url='+Utility.fixedEncodeURI(url)+"&format=json&callback=?", this._replaceVideoFrame(onErrorFunc, onSuccessFunc));
 	}
 
 	_replaceVideoFrame(onErrorFunc, onSuccessFunc){
@@ -72,7 +75,10 @@ class VideoController {
 				}
 				return;
 			}
+
 			$('#' + videoId).html(data.responseJSON.html);
+			console.log(data);
+			$('#' + videoId).html(data.html);
 			if(onSuccessFunc){
 				onSuccessFunc();
 			}
