@@ -93,15 +93,9 @@ function uploadData(){
 
 		var chapterOne = jsonData.chapters[0];
 		if(chapterOne){
-			$('#videoUrl').val(chapterOne.video.url);
-			$('#title').val(chapterOne.video.title);
-			if(chapterOne.slides[0]) {
-				var url = chapterOne.slides[0].url;
+			$('#ogURL').val(chapterOne.video.url);
+			$('#title').val(chapterOne.title);
 
-				url = url.replace("https://speakerdeck.com/","");
-				slideId = url.replace(/#\d+/i, "");
-				$('#slideId').val(slideId);
-			}
 		}
 	} catch (e){
 		console.error(e.message);
@@ -113,6 +107,8 @@ function uploadData(){
 	slidesArr = arr;
 
 	// update UI Metadata
+	$("#videoUrl").val($("#uploadSyncUrl").val());
+	$("#slideId").val($("#uploadSlideUrl").val());
 	//update UI slides
 
 	try{
