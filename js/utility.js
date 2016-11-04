@@ -3,4 +3,12 @@ class Utility{
 	static fixedEncodeURI (str) {
 		return encodeURIComponent(str)
 	}
+
+	static prependHttps(url){
+		var httpreg = /https?:\/\//;
+		if(!httpreg.exec(url)){
+			url = "https://" + url;
+		}
+		return url;
+	}
 }

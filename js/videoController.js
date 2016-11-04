@@ -96,6 +96,14 @@ class VideoController {
 		
 	}
 
+	togglePlay(){
+		if(this.isPaused()){
+			this.play();
+		} else {
+			this.pause();
+		}
+	}
+
 	isPaused(){
 		if(this.video){
 			return this.video.state() !== 'playing';

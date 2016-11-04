@@ -139,7 +139,21 @@
 
 	}
 
+	#page-cover {
+	    display: none;
+	    position: fixed;
+	    width: 100%;
+	    height: 100%;
+	    background-color: #000;
+	    z-index: 999;
+	    top: 0;
+	    left: 0;
+	}
 
+	.logo{
+		width:150px;
+		height:50px;
+	}
 
 	/*.simplebox {
 	  outline: 1px;
@@ -170,27 +184,29 @@
 	}*/
 
 </style>
-
 <body class="container">
 	<div id="header" class="page-header">
 		<div class="btn-toolbar pull-right">
+			<button type="button" class="btn btn-default">
+				Instructions
+			</button>
 			<div class="btn-group">
 				<!--<button type="button" class="btn btn-info">
 					<span class="glyphicon glyphicon-cog"></span>
 				</button>-->
 				<button type="button" class="btn btn-info" data-toggle="modal" data-target="#vidInfoModal">
-					Video Info
+					Video Info <span class="glyphicon glyphicon-pencil"></span>
 				</button>
 				<button type="button" class="btn btn-info" data-toggle="modal" data-target="#slideJSON" onclick="generateSlideJSON(); updateSlideUI();">
-					JSON
+					JSON <span class="glyphicon glyphicon-download-alt"></span>
 				</button>
-				<button type="button" class="btn btn-info" data-toggle="modal" data-target="#slideUpload">
+				<!--<button type="button" class="btn btn-info" data-toggle="modal" data-target="#slideUpload">
 					Upload JSON
-				</button>
+				</button>-->
 
 			</div>
 		</div>
-		<h1>realm</h1>
+		<img class="logo" src="https://realm.io/assets/svg/general_logo.svg"></img>
 	</div>
 	<div id="spacer" class="row">&nbsp;</div><!--space-->
 	<div  class="row">
@@ -200,15 +216,28 @@
 					<span class="glyphicon glyphicon-cog"></span>
 				</button>-->
 				<div id="video">
-					<span class="glyphicon glyphicon-repeat fast-right-spinner"></span>
 				</div>
-			</div>
+				<button type="button" class="btn btn-danger pull-right" onclick="recordTime();">
+					<span class="glyphicon glyphicon-record"></span> Mark Video Sync Time
+				</button>
 
+			</div>
+			<!--<div class="btn-group">
+				<button type="button" class="btn btn-info" onclick="videoController.">
+					<span class="glyphicon glyphicon-backward"></span>
+				</button>
+				<button type="button" class="btn btn-info" onclick="videoController.togglePlay()">
+					<span class="glyphicon glyphicon-play"></span> / <span class="glyphicon glyphicon-pause"></span>
+				</button>
+				<button type="button" class="btn btn-info" onclick="videoController.">
+					<span class="glyphicon glyphicon-forward"></span>
+				</button>
+			</div>-->
 			<div id="slideContainer" class="embed-responsive embed-responsive-16by9 ">
 				<div id="slideNumContainer" class="text-center">
 					<span id="slideNum" ><span>
 				</div>
-				<iframe id="slideSet" class="embed-responsive-item" src="" onLoad="slideLoadHandler()"></iframe> 
+				<div id="slideSet" class="embed-responsive-item"></div> 
 			</div>
 
 			<a href="https://www.yahoo.com/?ilc=401" target="_blank"> 
@@ -219,15 +248,6 @@
 
 		<div class="col-md-6 col-sm-6 col-xs-12">
 			<div class="table-responsive ">
-				<table class="table table-responsive">
-					<thead >
-				      <tr>
-							<th>Zero Index Slide #</th>
-							<th>Slide #</th>
-							<th>Time</th>
-				      </tr>
-				   </thead>
-				</table>
 				<div id="scrollPane" class="table_flow">
 					<table id="table" class="table table-responsive">
 						<tbody>
@@ -249,35 +269,78 @@
 
     <!-- Modal content-->
     <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title">Video Details</h4>
-      </div>
       <div class="modal-body">
-			<div class="row">
-				<div class="col-xs-12 input-group">
-					<input placeholder="Video URL" type="text" class="form-control" id="videoUrl">
-				</div>
-			</div>
-			<br/><!--space-->
-			<div class="row">
-				<div class="col-xs-12 input-group">
-					<input placeholder="Video Title" type="text" class="form-control" id="title">
-				</div>
-			</div>
-			<br/><!--space-->
-			<div class = "row">
-				<div class="col-xs-12 input-group">
-					<input placeholder="Slide Deck Id" type="text" class="form-control" id="slideId">
-				</div>
-			</div>
+      	<button type="button" class="close" data-dismiss="modal">&times;</button>
+      	<ul class="nav nav-tabs ">
+        		<li class="active">
+        			<a href="#vidDetails" data-toggle="tab">Video Details</a>
+        		</li>
+        		<li>
+        			<a href="#uploadJSON" data-toggle="tab">Use Created Slide-Sync</a>
+        		</li>
+        	</ul>
 
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-default" onclick="updateMetadata()">Submit</button>
-        
-      </div>
-    </div>
+      	<div class="tab-content">
+      		<div id="vidDetails" class="tab-pane active">
+      			<br/>
+      			<p>
+      				Place the details of your transcription project below.
+      			</p>
+      		
+					<div class="col-xs-12 input-group">
+						<label for="title">Title</label>
+						<input placeholder="Video Title" type="text" class="form-control" id="title" name="title">
+					</div>
+					<!--<br/>space-->
+					<div class="col-xs-12 input-group">
+						<label for="slidesyncURL">Slide-Sync Video URL</label>
+						<input placeholder="Slide sync Video URL" type="text" class="form-control" id="videoUrl" name="slidesyncUrl">
+					</div>
+					<!--<br/>space-->
+					<div class="col-xs-12 input-group">
+						<label for="ogURL">Original Video URL</label>
+						<input placeholder="Actual Video URL from wisitia" type="text" class="form-control" id="ogURL" name="ogURL">
+					</div>
+					<!--<br/>space-->
+					<div class="col-xs-12 input-group">
+						<label for="slideURL">SpeakerDeck slides URL</label>
+						<input placeholder="SpeakerDeck Url" type="text" class="form-control" id="slideId" name="slideURL">
+					</div>
+					<br/>
+					<button class="btn btn-default pull-right" onclick="updateMetadata()">
+						Submit
+					</button>
+					<div class="clearfix"></div>
+				</div>
+
+				<div id="uploadJSON" class="tab-pane">
+					<br/>
+					<p>
+      				Have a previously made .json file that you would like to use with this tool? Fill in the details below.
+      			</p>
+					<div class="col-xs-12 input-group"> <!--Url for slidesync vid-->
+						<label for="slidesyncURL">Slide-Sync Video URL</label>
+						<input placeholder="Slide sync Video URL" type="text" class="form-control" id="uploadSyncUrl" name="slidesyncUrl">
+					</div>
+					<div class="col-xs-12 input-group"><!--Slide deck Url-->
+						<label for="slideURL">SpeakerDeck slides URL</label>
+						<input placeholder="SpeakerDeck Url" type="text" class="form-control" id="uploadSlideUrl" name="slideURL">
+					</div>
+					<div class="col-xs-12 input-group"><!--contents of JSON-->
+						<label for="slideURL">Contents of .json file</label>
+						<textarea class="form-control" rows="5" id="uploadVal" placeholder=""></textarea>
+					</div>
+					
+					<p id = "errorLoc">
+					</p>
+					<button class="btn btn-default pull-right" onclick="uploadData()">
+						Submit
+					</button>
+					<div class="clearfix"></div>
+				</div>
+			</div>
+   	</div>
+  	</div>
 
   </div>
 </div>
@@ -289,19 +352,23 @@
 		<div class="modal-content">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal">&times;</button>
-				<h4 class="modal-title">Video Info</h4>
+				<h4 class="modal-title">Video JSON Object</h4>
 			</div>
 			<div class="modal-body">
-				<textarea class="form-control" rows="5" id="values" placeholder="Load a video with a URL above searching for wistia_23_source in the source of the video page."></textarea>
+				<textarea class="form-control" rows="5" id="values" placeholder="Leave the modal and hit JSON and you can see the "></textarea>
 			</div>
+			<!--<button class="btn btn-default pull-right">
+				Save
+			</button>-->
 		</div>
 	</div>
 </div>
 
+<!--
 <div id="slideUpload" class="modal fade" role="dialog">
 	<div class="modal-dialog">
 
-		<!-- Modal content-->
+		Modal content
 		<div class="modal-content">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -320,7 +387,7 @@
 	</div>
 
 </div>
-
+-->
 <script>
 
 document.addEventListener("DOMContentLoaded", init, false);
@@ -334,6 +401,9 @@ $(window).resize(function(){
 
 $(window).resize(); //on page load
 
+$("#dim_wrapper").animate({
+    'opacity':0.5
+});
 </script>
 </body>
 </html>

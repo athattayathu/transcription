@@ -32,19 +32,31 @@ var videoController;
 
 var clipbrd;
 
+var FTU = true;
+
 function generateSlideJSON(){
 
 	var storeArr = [];
+	var speakerUrl = $('#slideId').val()
+	var url = slideController.getSlideSpecificUrl();
 	for(var i = 0; i < slidesArr.length; i++){
 		var object = {
 			"time" : slidesArr[i].time,
-			"url" : "https://speakerdeck.com/" + $('#slideId').val() + "#" + slidesArr[i].slideNum
+			"url" :  url + "#" + slidesArr[i].slideNum
 		}
 		storeArr.push(object);
 	}
 
 	obj.chapters[0].slides = storeArr;
 	obj.chapters[0].duration = videoController.getTotalDuration();
+
+	var title = $("#title").val();
+	title = (title) ? title : "untitled" ;
+	obj.title = title;
+	obj.chapters[0].title = title;
+
+	var ogUrl = $('#ogURL').val();
+	obj.chapters[0].video.url = (ogUrl) ? ogUrl : "don't have url";
 }
 
 
@@ -69,7 +81,7 @@ function uploadData(){
 	try{
 		jsonData = JSON.parse($('#uploadVal').val());
 	} catch(e){
-		console.log(e);
+		console.error(e.message);
 		return;
 	}
 
@@ -92,7 +104,7 @@ function uploadData(){
 			}
 		}
 	} catch (e){
-		console.log(e);
+		console.error(e.message);
 		return;
 	}
 
@@ -110,7 +122,7 @@ function uploadData(){
 			console.log(e.message);
 		}
 		else{
-			throw e;
+			console.error(e.message);
 		}
 
 	}
@@ -140,28 +152,6 @@ function _deconstructSlides(slides){
 	return returnArr;
 }
 
-/**
- * Create a string of the format hh:mm:ss or mm:ss from time in seconds passed in
- **/
-function timeToStr(time){
-
-	const MINUTE_TO_SECOND = 60;
-	const HOUR_TO_SECOND = 3600;
-
-	var hour = Math.trunc(time /HOUR_TO_SECOND);
-
-	var minute = Math.trunc(time / MINUTE_TO_SECOND);
-	var seconds = time % MINUTE_TO_SECOND;
-	seconds = (seconds < 10)? '0' + seconds : seconds;
-
-	var res =  minute + ':' + seconds ;
-	res = (hour) ? (hour+":"+res) : res;
-        console.log(time);
-	console.log(res);
-	return res;
-}
-
-
 function refreshSlideTable(){
 
 
@@ -169,7 +159,7 @@ function refreshSlideTable(){
 
 	for (var i = 0; i < slidesArr.length; i++) {
 	
-		var time = timeToStr(slidesArr[i].time);
+		var time = Utility.timeToStr(slidesArr[i].time);
 
 		var zIndex = slidesArr[i].slideNum - 1;
 		$('#table').append(
@@ -198,13 +188,13 @@ function updateMetadata(){
 		changeVideo();
 		changeSlide();
 		changeName();
-		$('#myModal').modal('hide');
+		$('#vidInfoModal').modal('hide');
 	} catch (e) {
 		if(e instanceof ControllerError) {
 			console.log(e.message);
 		}
 		else{
-			throw e;
+			console.error(e.message);
 		}
 	}
 }
@@ -220,20 +210,24 @@ function updateSlideUI(){
 
 function changeName(){
 
-	obj.title = 
-		obj.chapters[0].title = 
-		$('#title').val();
+	var title = $("#title").val();
+
+	obj.title = title;
+	obj.chapters[0].title = title;
 
 }
 
 function changeVideo(){
-	var httpreg = /https?:\/\//;
 	var jqUrl = $("#videoUrl");
-	var newUrl = jqUrl.val();
-	if(!httpreg.exec(newUrl)){
-		newUrl = "https://" + newUrl;
-		jqUrl.val(newUrl);
+	var newUrl;
+	if(! jqUrl.val()){
+		jqUrl = $("#ogURL");
 	}
+	
+	newUrl = Utility.prependHttps(jqUrl.val());
+
+	console.log(newUrl);
+	jqUrl.val(newUrl);
 	try{
 		videoController.changeVideo(newUrl);
 		jqUrl.parent().removeClass("has-error", "has-feedback");
@@ -244,8 +238,16 @@ function changeVideo(){
 }
 
 function changeSlide(){
-
-	slideController.init($('#slideId').val());
+	var jqUrl = $('#slideId');
+	var slideUrl = Utility.prependHttps(jqUrl.val());
+	
+	try{
+		slideController.changeDeck(slideUrl);
+		jqUrl.parent().removeClass("has-error", "has-feedback");
+	} catch (e){
+		jqUrl.parent().addClass("has-error", "has-feedback");
+		throw e;
+	}
 
    $('#slideNum').text(slideController.getCurrentSlide());
 
@@ -318,23 +320,20 @@ function keypressed(event){
    }
 }
 
-function slideLoadHandler() {
-
-	var slideFrame = document.getElementById("slideSet");
-
-   slideController = new SlideController("slideContainer" , slideFrame, window);
-
-}
 
 function init()
 {
    var video = document.getElementById("video");
-
+   if (FTU){
+   	$('#vidInfoModal').modal('show');
+   	FTU = false;
+   }
    $(document).unbind('keydown');//removes any previous handlers left over after refresh
    $(document).keydown(keypressed);
    clipbrd = new Clipboard('.cp');
 
    videoController = new VideoController('video', window);
+   slideController = new SlideController("slideSet", window);
  
 }
 

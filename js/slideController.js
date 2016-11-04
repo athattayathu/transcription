@@ -1,8 +1,8 @@
 class SlideController {
 
-	constructor(slideContrainer,slidesIframe, window){
+	constructor(slideContrainer,window){
 
-		this.slidesIframe = slidesIframe;
+		this.slidesIframe;
 
 		this.currentSlide = 1;
 
@@ -12,37 +12,62 @@ class SlideController {
 
 		this.slideDeckUrl = "";
 
+		this.slideSpecificUrl = "";
+
 		this.slideContrainer = slideContrainer
+
+		this.reg = /http(s)?:\/\/speakerdeck.com\/realm\//
 		
 	}
 
 	init(slideDeckUrl) {
 		this.changeDeck(slideDeckUrl);
-		
 	}
 
+	getSlideDeckUrl(){
+		return this.slideDeckUrl;
+	}
+
+	getSlideSpecificUrl() {
+		return this.slideSpecificUrl;
+	}
+
+	/**
+	* This function changes the slide Deck to the given Url
+	* @param slideDeckUrl string from https://speakerdeck.com/realm/
+	*/
 	changeDeck(slideDeckUrl){
+
+		if (typeof slideDeckUrl !== 'string'){
+			throw new TypeError("Need a string as the url");
+		}
+		if(!this.reg.exec(slideDeckUrl)){
+			throw new ControllerError("The slides need to be from https://speakerdeck.com/realm/");
+		}
+
+		if(this.slideDeckUrl === slideDeckUrl){
+			return;
+		}
+
 		this._getSlideData(slideDeckUrl);
 		this.slideDeckUrl = slideDeckUrl;
 		this.currentSlide = 1;
 		this.slideDeckOrigin = "";
 
-		_getSlideData(slideDeckUrl);
-
 		//this.slidesIframe.setAttribute("src", 'https://speakerdeck.com/player/'+slideDeckUrl);
 
-		//this.window.removeEventListener('message', this.receiver);
-		//this.window.addEventListener('message', this.receiver, false);
-		//this.slidesIframe.contentWindow.postMessage(JSON.stringify(["ping"]), "*");
+		this.window.removeEventListener('message', this.receiver);
+		this.window.addEventListener('message', this.receiver, false);
 
 	}
 
 	_getSlideData(slideDeckUrl){
+		console.log("started getting slides");
 				$.ajax({
 			type:"GET",
 		  	url:"https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D'" 
 		  		+ Utility.fixedEncodeURI("https://speakerdeck.com/oembed.json?url=" 
-		  			+ Utility.fixedEncodeURI("https://speakerdeck.com/realm/scott-gardner-reactive-programming-with-rxswift")
+		  			+ Utility.fixedEncodeURI(slideDeckUrl)
 		  		)
 		  		+ "'&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys",
 		  	dataType:'jsonp',
@@ -52,10 +77,23 @@ class SlideController {
 
 	_slideCallback(){
 		var container = this.slideContrainer;
+		var self = this;
+		
 		return function(data){
-        	var res = JSON.parse(data.responseJSON.query.results.body);
-          $('#'+container).html(res.html);
-        }
+			//replace contents to have the iframe
+			var res = JSON.parse(data.responseJSON.query.results.body);
+			$('#'+container).html(res.html);
+			self.slidesIframe = $('#' + container + '>iframe')[0];
+
+			//get the slide specific url
+			var specUrl = self.slidesIframe.getAttribute("src");
+			specUrl = 'https://' + specUrl.substr(specUrl.indexOf('speakerdeck.com'));
+			self.slideSpecificUrl = specUrl;
+
+			//get hold of details of slides
+			self.slidesIframe.contentWindow.postMessage(JSON.stringify(["ping"]), "*");
+			console.log("Message should be posted");
+		}
 	}
 
 
@@ -63,7 +101,7 @@ class SlideController {
 		this.currentSlide++;
 
 		this.slidesIframe.contentWindow.postMessage(
-			JSON.stringify(["goToSlide", this.currentSlide]), "*");
+		JSON.stringify(["goToSlide", this.currentSlide]), "*");
 	}
 
 	previous(){
@@ -84,12 +122,10 @@ class SlideController {
 		}
 	}
 
-	/*receiver(event) {
+	receiver(event) {
 
-	   if (!event.origin.startsWith('https:speakerdeck.com/player/')) {
-	   	console.log(event);
-	   	console.log("got response from wrong site");
-	   	console.log(event.data);
+	   if (!event.origin.startsWith('https://speakerdeck.com/player/')) {
+	   	console.log("got response from wrong site"+event.origin);
 	     	return;
 	   } 
 
@@ -104,7 +140,7 @@ class SlideController {
 	   	this.currentSlide = data[1].number;
 	   }
 
-	}*/
+	}
 
 	getCurrentSlide(){
 		return this.currentSlide;
