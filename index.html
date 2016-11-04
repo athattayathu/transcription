@@ -155,6 +155,11 @@
 		height:50px;
 	}
 
+	.key {
+		width:auto;
+		height:30px;
+	}
+
 	/*.simplebox {
 	  outline: 1px;
 	  border: 1px;
@@ -186,17 +191,16 @@
 </style>
 <body class="container">
 	<div id="header" class="page-header">
+		<img class="logo" src="https://realm.io/assets/svg/general_logo.svg"></img>
 		<div class="btn-toolbar pull-right">
 			<div class="btn-group">
-				<button type="button" class="btn btn-default">
-					Instructions
+				<button type="button" class="btn btn-default" data-toggle="collapse" href="#instructions">
+					Instructions <span class="glyphicon glyphicon-info-sign"></span>
 				</button>
 				
-					<a href="mailto:anilthattayathu@yahoo.com" type="button" class="btn btn-default" >
-						
-						Feedback
-					</a>
-				
+				<a href="mailto:anilthattayathu@yahoo.com" type="button" class="btn btn-default" >
+					Feedback <span class="glyphicon glyphicon-envelope"></span>
+				</a>
 			</div>
 			<div class="btn-group">
 				<!--<button type="button" class="btn btn-info">
@@ -214,8 +218,50 @@
 
 			</div>
 		</div>
-		<img class="logo" src="https://realm.io/assets/svg/general_logo.svg"></img>
+		
 	</div>
+
+	<div id="instructions"class="row collapse">
+		<div class="col-xs-12">
+			<ul class="nav nav-tabs ">
+        		<li class="active">
+        			<a href="#basicInst" data-toggle="tab">Basic Instructions</a>
+        		</li>
+        		<li>
+        			<a href="#advancedInst" data-toggle="tab">Extreme Instructions</a>
+        		</li>
+        	</ul>
+        	<div id="spacer" class="row">&nbsp;</div><!--space-->
+        	<div class="tab-content">
+      		<div id="basicInst" class="tab-pane active">
+      			<p>
+      				Load up the transcription info in the Video Info popup
+      			</p>
+      			<p>
+      				Use the Mark Video Sync Time button to mark the slide transitions
+      			</p>
+      		</div>
+      		<div id="advancedInst" class="tab-pane">
+
+      			<img class="key" src="/img/keys/shift.png" alt="shift"/>
+      			Mark sync time
+      			<img class="key" src="/img/keys/a.png" alt="a"/>
+      			Previous slide
+      			<img class="key" src="/img/keys/d.png" alt="d"/>
+      			Next slide
+      			<img class="key" src="/img/keys/right.png" alt="right arrow"/>
+      			Skip forward video
+      			<img class="key" src="/img/keys/left.png" alt="left arrow"/>
+      			Skip backwards video
+      			<img class="key" src="/img/keys/spacebar.png" alt="spacebar"/>
+      			Pause/play video
+      			keys from https://github.com/q2apro/keyboard-keys-speedflips
+      		</div><!--advanced Div-->
+      	</div><!--tab content-->
+      	<hr/>
+		</div>
+	</div>
+
 	<div id="spacer" class="row">&nbsp;</div><!--space-->
 	<div  class="row">
 		<div id="media_container" class="col-md-6 col-sm-6 col-xs-12">
@@ -408,6 +454,8 @@ $(window).resize(function(){
 })
 
 $(window).resize(); //on page load
+
+window.onbeforeunload = function(){ return 'Anything not saved to your computer will be lost...' }
 
 $("#dim_wrapper").animate({
     'opacity':0.5

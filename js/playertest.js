@@ -260,6 +260,14 @@ function goToView(videoTime, slideNum){
 	$('#slideNum').text(slideController.getCurrentSlide());
 }
 
+function recordTime(){
+	if(videoController.isReady()){
+	   	addSlideObj();
+	   	updateSlideUI();
+	   	refreshSlideTable();
+	}
+}
+
 function keypressed(event){
 
 	if ($(event.target).is('input, textarea')) {
@@ -276,11 +284,7 @@ function keypressed(event){
         keycode = event.which;
 
    if(keycode === keyConfig.recordTime){
-   	if(videoController.isReady()){
-	   	addSlideObj();
-	   	updateSlideUI();
-	   	refreshSlideTable();
-	   }
+   	recordTime();
 
    } else if(keycode === keyConfig.removeLast){
 
