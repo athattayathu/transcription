@@ -14,9 +14,13 @@ class SlideController {
 
 		this.slideSpecificUrl = "";
 
-		this.slideContainer = slideContainer
+		this.slideContainer = slideContainer;
 
-		this.reg = /http(s)?:\/\/speakerdeck.com\/realm\//
+		this.reg = /http(s)?:\/\/speakerdeck.com\/realm\//;
+
+		this.pingInterval = null;
+
+		this._slideChangeList = [];
 		
 	}
 
@@ -56,8 +60,8 @@ class SlideController {
 
 		//this.slidesIframe.setAttribute("src", 'https://speakerdeck.com/player/'+slideDeckUrl);
 
-		this.window.removeEventListener('message', this.receiver);
-		this.window.addEventListener('message', this.receiver, false);
+		this.window.removeEventListener('message', this.receiver(this));
+		this.window.addEventListener('message', this.receiver(this), false);
 
 	}
 
@@ -88,18 +92,34 @@ class SlideController {
 				return;
 			}
 
+			console.log(data);
 			//replace contents to have the iframe
 			var res = JSON.parse(data.responseJSON.query.results.body);
-			$('#'+container).html(res.html);
-			self.slidesIframe = $('#' + container + '>iframe')[0];
+			var matches = res.html.match(/\/\/speakerdeck.com\/player\/(\S*)(?:")/);
+			var slideId = matches[1];
 
-			//get the slide specific url
-			var specUrl = self.slidesIframe.getAttribute("src");
-			specUrl = 'https://' + specUrl.substr(specUrl.indexOf('speakerdeck.com'));
+			var script = document.createElement("script");
+	      script.type = "text/javascript";
+	      script.async = true;
+	      script.src = "http://speakerdeck.com/assets/embed.js";
+	      script.setAttribute("class", "speakerdeck-embed");
+	      script.setAttribute("data-id", slideId);
+
+	      $('#'+container)[0].appendChild(script);			
+
+			this.pingInterval = setInterval((function(self){
+					return function() {
+						var frame = $("iframe.speakerdeck-iframe");
+							if (frame.length > 0 && frame[0].contentWindow) {
+								self.slidesIframe = frame[0];
+								clearInterval(self.pingInterval); 
+								return frame[0].contentWindow.postMessage(JSON.stringify(["ping"]), "*");
+							}
+			        }
+			     })(self), 500);
+			
+			var specUrl = 'https://' + matches[0].substr(matches[0].indexOf('speakerdeck.com'));
 			self.slideSpecificUrl = specUrl;
-
-			//get hold of details of slides
-			self.slidesIframe.contentWindow.postMessage(JSON.stringify(["ping"]), "*");
 			if (onSuccessFunc) {
 				onSuccessFunc();
 			}
@@ -108,18 +128,16 @@ class SlideController {
 
 
 	next(){
-		this.currentSlide++;
 
 		this.slidesIframe.contentWindow.postMessage(
-		JSON.stringify(["goToSlide", this.currentSlide]), "*");
+		JSON.stringify(["goToSlide", this.currentSlide + 1]), "*");
 	}
 
 	previous(){
 		if(this.currentSlide > 1){
-			this.currentSlide--;
 
 			this.slidesIframe.contentWindow.postMessage(
-				JSON.stringify(["goToSlide", this.currentSlide]), "*");
+				JSON.stringify(["goToSlide", this.currentSlide - 1]), "*");
 		}
 	}
 
@@ -132,24 +150,30 @@ class SlideController {
 		}
 	}
 
-	receiver(event) {
+	receiver(self) {
+		return function(event){
+		   if (!event.origin.startsWith('https://speakerdeck.com')) {
+		   	console.log("got response from wrong site"+event.origin);
+		     	return;
+		   }
 
-	   if (!event.origin.startsWith('https://speakerdeck.com/player/')) {
-	   	console.log("got response from wrong site"+event.origin);
-	     	return;
-	   } 
+		   self.slideDeckOrigin = event.origin;
 
-	   console.log("ok we got a response");
+		   var data = JSON.parse(event.data);
 
-	   this.slideDeckOrigin = event.origin;
-	   console.log(this.slideDeckOrigin);
+		   if (data[0] === "change") {
+		   	console.log("current" + self.currentSlide);
+		   	self.currentSlide = data[1].number;
+		   	for( callback in self._slideChangeList)
+		   	{
+		   		callback(data[1].number);
+		   	}
+		   }
+		};
+	}
 
-	   var data = JSON.parse(event.data);
-	   console.log(data);
-	   if (data[0] == "change") {
-	   	this.currentSlide = data[1].number;
-	   }
-
+	onSlideChange(fun){
+		this._slideChangeList.push(fun);
 	}
 
 	getCurrentSlide(){

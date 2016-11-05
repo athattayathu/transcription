@@ -249,31 +249,76 @@
         	<div id="spacer" class="row">&nbsp;</div><!--space-->
         	<div class="tab-content">
       		<div id="basicInst" class="tab-pane active">
-      			<p>
-      				Load up the transcription info in the Video Info popup
-      			</p>
-      			<p>
-      				Use the Mark Video Sync Time button to mark the slide transitions
-      			</p>
+      			<ol>
+      				<li>Load up the transcription info in the <a onclick="$('#vidInfoModal').modal('show');">Video Info</a> popup.
+      				</li>
+	      			<li>
+	      				Use the <span class="glyphicon glyphicon-record"></span>  button on the video to mark the slide transitions.
+	      			</li>
+	      			<li>
+	      				Use the escape key to remove the last slide transitions.
+	      			</li>
+	      			<li>
+	      				Open the <a data-toggle="modal" data-target="#slideJSON" onclick="generateSlideJSON(); updateSlideUI();">.json modal </a> to see what you made!
+	      			</li>
+	      			<li>
+	      				Copy and paste the contents to a .json file
+	      			</li>
+	      			<li>
+	      				Tell us what you think!
+	      			</li>
+	      		<ol>
       		</div>
       		<div id="advancedInst" class="tab-pane">
+      			<div class="table-responsive">
+						<table class="table" style = "margin-bottom:0px;">
+						<tbody>
+							<tr>
+	      					<td>
+      							<img class="key" src="/img/keys/shift.png" alt="shift" data-toggle="popover" data-content="shift" data-placement="top" data-trigger="hover"/>
+      							Mark sync time
+			      			</td>
+			      			<td>
+				      			<img class="key" src="/img/keys/a.png" alt="a" data-toggle="popover" data-content="a" data-placement="top" data-trigger="hover"/>
+				      			Previous slide
+				      		</td>
+			      			<td>
+				      			<img class="key" src="/img/keys/left.png" alt="left arrow" data-toggle="popover" data-content="left arrow" data-placement="top" data-trigger="hover"/>
+				      			Skip backwards video
+				      		</td>
+			      		</tr>
+			      		<tr>
+			      			<td>
+			      				<img class="key" src="/img/keys/esc.png" alt="escape" data-toggle="popover" data-content="esc" data-placement="top" data-trigger="hover"/>
+			      				Remove last Sync time
+			      			</td>
+				      		<td>
+				      			<img class="key" src="/img/keys/d.png" alt="d" data-toggle="popover" data-content="d" data-placement="top" data-trigger="hover"/>
+				      			Next slide
+				      		</td>
+				      		<td>
+				      			<img class="key" src="/img/keys/right.png" alt="right arrow" data-toggle="popover" data-content="Right Arrow" data-placement="top" data-trigger="hover"/>
+				      			Skip forward video
+				      		</td>
+				      	</tr>
+				      	<tr>
+				      		<td>
+				      		</td>
+				      		<td>
+   			      			<img class="key" src="/img/keys/spacebar.png" alt="spacebar" data-toggle="popover" data-content="space" data-placement="top" data-trigger="hover"/>
+      							Pause/play video 
+      						</td>
+      						<td>
+      						</td>
+						</tbody>
+						</table>
+					</div>
+	      			
+		      	
 
-      			<img class="key" src="/img/keys/shift.png" alt="shift"/>
-      			Mark sync time
-      			<img class="key" src="/img/keys/a.png" alt="a"/>
-      			Previous slide
-      			<img class="key" src="/img/keys/d.png" alt="d"/>
-      			Next slide
-      			<img class="key" src="/img/keys/right.png" alt="right arrow"/>
-      			Skip forward video
-      			<img class="key" src="/img/keys/left.png" alt="left arrow"/>
-      			Skip backwards video
-      			<img class="key" src="/img/keys/spacebar.png" alt="spacebar"/>
-      			Pause/play video
-      			keys from https://github.com/q2apro/keyboard-keys-speedflips
       		</div><!--advanced Div-->
       	</div><!--tab content-->
-      	<hr/>
+      	<hr style="margin:0px;"/>
 		</div>
 	</div>
 
@@ -362,7 +407,7 @@
 						<input placeholder="SpeakerDeck Url" type="text" class="form-control" id="slideId" name="slideURL">
 					</div>
 					<br/>
-					<button class="btn btn-default pull-right" onclick="updateMetadata()">
+					<button class="btn btn-primary pull-right" onclick="updateMetadata()">
 						Submit
 					</button>
 					<div class="clearfix"></div>
@@ -388,7 +433,7 @@
 					
 					<p id = "errorLoc">
 					</p>
-					<button class="btn btn-default pull-right" onclick="uploadData()">
+					<button class="btn btn-primary pull-right" onclick="uploadData()">
 						Submit
 					</button>
 					<div class="clearfix"></div>
@@ -455,6 +500,10 @@ $(window).resize(function(){
 })
 
 $(window).resize(); //on page load
+
+$(function () {
+  $('[data-toggle="popover"]').popover()
+})
 
 window.onbeforeunload = function(){ return 'Anything not saved to your computer will be lost...' }
 

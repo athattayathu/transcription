@@ -1,5 +1,8 @@
 List of open source libraries used
 
+Open Lisence
+	key images = https://github.com/q2apro/keyboard-keys-speedflips
+
 MIT License
 	notifications = http://bootstrap-notify.remabledesigns.com/
 	clipboard = https://clipboardjs.com/
@@ -8,4 +11,3 @@ MIT License
 List API's Used
 	speakerdeck embed with yahoo = https://developer.yahoo.com/yql/
 	speakerdeck thumbnail = https://speakerd.s3.amazonaws.com/presentations/
-	
