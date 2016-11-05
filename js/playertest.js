@@ -239,6 +239,10 @@ function changeVideo(){
 	}
 }
 
+function onSlideChange(slideNum){
+	$('#slideNum').text(slideController.getCurrentSlide());
+}
+
 function changeSlide(){
 	var jqUrl = $('#slideId');
 	var slideUrl = Utility.prependHttps(jqUrl.val());
@@ -252,8 +256,6 @@ function changeSlide(){
 		jqUrl.parent().addClass("has-error", "has-feedback");
 		throw e;
 	}
-
-   $('#slideNum').text(slideController.getCurrentSlide());
 
 }
 
@@ -341,7 +343,10 @@ function init()
 
    videoController = new VideoController('video', window);
    slideController = new SlideController("slideSet", window);
-   notificationHandler = new NotificationHandler();
+  	notificationHandler = new NotificationHandler();
+  	
+   slideController.onSlideChange(onSlideChange);
+   
  
 }
 

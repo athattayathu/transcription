@@ -20,7 +20,7 @@ class SlideController {
 
 		this.pingInterval = null;
 
-		this._slideChangeList = [];
+		this._slideChange = undefined;
 		
 	}
 
@@ -153,7 +153,6 @@ class SlideController {
 	receiver(self) {
 		return function(event){
 		   if (!event.origin.startsWith('https://speakerdeck.com')) {
-		   	console.log("got response from wrong site"+event.origin);
 		     	return;
 		   }
 
@@ -162,18 +161,19 @@ class SlideController {
 		   var data = JSON.parse(event.data);
 
 		   if (data[0] === "change") {
-		   	console.log("current" + self.currentSlide);
 		   	self.currentSlide = data[1].number;
-		   	for( callback in self._slideChangeList)
-		   	{
-		   		callback(data[1].number);
-		   	}
+		   	self._slideChange(data[1].number);
+
 		   }
 		};
 	}
 
 	onSlideChange(fun){
-		this._slideChangeList.push(fun);
+		this._slideChange = fun;
+	}
+
+	removeOnSlideChange(){
+		this._slideChange = undefined;
 	}
 
 	getCurrentSlide(){
