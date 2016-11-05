@@ -97,8 +97,8 @@ class SlideController {
 			var matches = res.html.match(/\/\/speakerdeck.com\/player\/(\S*)(?:")/);
 			var slideId = matches[1];
 
-			self.slideSpecificUrl = "https://speakerdeck.com/player" + match[1];
-			
+			self.slideSpecificUrl = "https://speakerdeck.com/player" + matches[1];
+
 			var script = document.createElement("script");
 	      script.type = "text/javascript";
 	      script.async = true;
