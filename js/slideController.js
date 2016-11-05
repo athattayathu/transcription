@@ -14,6 +14,8 @@ class SlideController {
 
 		this.slideSpecificUrl = "";
 
+		this.slideId = "";
+
 		this.slideContainer = slideContainer;
 
 		this.reg = /http(s)?:\/\/speakerdeck.com\/realm\//;
@@ -97,7 +99,8 @@ class SlideController {
 			var matches = res.html.match(/\/\/speakerdeck.com\/player\/(\S*)(?:")/);
 			var slideId = matches[1];
 
-			self.slideSpecificUrl = "https://speakerdeck.com/player" + matches[1];
+			self.slideSpecificUrl = "https://speakerdeck.com/player/" + matches[1];
+			self.slideId = matches[1];
 
 			var script = document.createElement("script");
 	      script.type = "text/javascript";
@@ -147,6 +150,10 @@ class SlideController {
 			this.slidesIframe.contentWindow.postMessage(
 				JSON.stringify(["goToSlide", this.currentSlide]), "*");
 		}
+	}
+
+	getSlideId(){
+		return this.slideId;
 	}
 
 	receiver(self) {
