@@ -92,12 +92,13 @@ class SlideController {
 				return;
 			}
 
-			console.log(data);
 			//replace contents to have the iframe
 			var res = JSON.parse(data.responseJSON.query.results.body);
 			var matches = res.html.match(/\/\/speakerdeck.com\/player\/(\S*)(?:")/);
 			var slideId = matches[1];
 
+			self.slideSpecificUrl = "https://speakerdeck.com/player" + match[1];
+			
 			var script = document.createElement("script");
 	      script.type = "text/javascript";
 	      script.async = true;
@@ -117,9 +118,7 @@ class SlideController {
 							}
 			        }
 			     })(self), 500);
-			
-			var specUrl = 'https://' + matches[0].substr(matches[0].indexOf('speakerdeck.com'));
-			self.slideSpecificUrl = specUrl;
+		
 			if (onSuccessFunc) {
 				onSuccessFunc();
 			}

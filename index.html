@@ -347,7 +347,7 @@
 		</div>
 
 		<div class="col-md-6 col-sm-6 col-xs-12">
-			<div class="table-responsive ">
+			<div class="table-responsive">
 				<div id="scrollPane" class="table_flow">
 					<table id="table" class="table table-responsive">
 						<tbody>
@@ -407,9 +407,16 @@
 						<input placeholder="SpeakerDeck Url" type="text" class="form-control" id="slideId" name="slideURL">
 					</div>
 					<br/>
-					<button class="btn btn-primary pull-right" onclick="updateMetadata()">
-						Submit
-					</button>
+					<div>
+					
+						<button class="btn btn-primary pull-right" onclick="updateMetadata()">
+							Submit
+						</button>
+						<div>
+							<ul id="vidInfoError" class = "list-group pull-left">
+							<ul>
+						</div>
+					</div>
 					<div class="clearfix"></div>
 				</div>
 

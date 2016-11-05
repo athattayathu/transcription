@@ -185,13 +185,14 @@ function refreshSlideTable(){
 
 function updateMetadata(){
 	try{
+		$('#vidInfoError').empty();
 		changeVideo();
 		changeSlide();
 		changeName();
 		$('#vidInfoModal').modal('hide');
 	} catch (e) {
 		if(e instanceof ControllerError) {
-			console.log(e.message);
+			$('#vidInfoError').append('<li class="list-group-item alert alert-danger">'+ e.message +'</li>');
 		}
 		else{
 			console.error(e.message);
@@ -344,7 +345,7 @@ function init()
    videoController = new VideoController('video', window);
    slideController = new SlideController("slideSet", window);
   	notificationHandler = new NotificationHandler();
-  	
+
    slideController.onSlideChange(onSlideChange);
    
  
