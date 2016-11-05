@@ -156,7 +156,7 @@ function refreshSlideTable(){
 	$("#table tbody tr").remove();
 
 	var specUrl = slideController.getSlideSpecificUrl();
-	specUrl = "https://speakerd.s3.amazonaws.com/presentations/" + slideController.getSlideId());
+	specUrl = "https://speakerd.s3.amazonaws.com/presentations/" + slideController.getSlideId();
 	for (var i = 0; i < slidesArr.length; i++) {
 	
 		var time = Utility.timeToStr(slidesArr[i].time);
