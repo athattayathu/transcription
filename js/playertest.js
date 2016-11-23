@@ -1,17 +1,3 @@
-var obj = {
-		  "title": "",
-		  "chapters": [
-			   {
-			      "title": "",
-			      "duration": "",
-			      "video": {
-			        "url": ""
-			      },
-			      "slides": [
-			      ]
-			   }
-   		]
-   	};
 
 var keyConfig = {
 			"recordTime" : 16,//shift
@@ -24,11 +10,13 @@ var keyConfig = {
 			"slideReverse" : 65//d
 	};
 
-var slidesArr = [];
+
 
 var slideController;
 
 var videoController;
+
+var syncObj;
 
 var notificationHandler;
 
@@ -36,45 +24,11 @@ var clipbrd;
 
 var FTU = true;
 
-function generateSlideJSON(){
-
-	var storeArr = [];
-	var speakerUrl = $('#slideId').val()
-	var url = slideController.getSlideSpecificUrl();
-	for(var i = 0; i < slidesArr.length; i++){
-		var object = {
-			"time" : slidesArr[i].time,
-			"url" :  url + "#" + slidesArr[i].slideNum
-		}
-		storeArr.push(object);
-	}
-
-	obj.chapters[0].slides = storeArr;
-	obj.chapters[0].duration = videoController.getTotalDuration();
-
-	var title = $("#title").val();
-	title = (title) ? title : "untitled" ;
-	obj.title = title;
-	obj.chapters[0].title = title;
-
-	var ogUrl = $('#ogURL').val();
-	obj.chapters[0].video.url = (ogUrl) ? ogUrl : "don't have url";
-}
 
 
 
 function addSlideObj(){
-	var slideNum = 1;
-	if(slidesArr.length > 0){
-		slideNum = slidesArr[slidesArr.length - 1].slideNum + 1;
-	}
-
-   var source = {
-				"time" : Math.round(videoController.getCurTime()),
-				"slideNum" : slideNum
-			 };
-	slidesArr.push(source);
-
+	syncObj.addSlideObj(Math.round(videoController.getCurTime()) )
 }
 
 function uploadData(){
@@ -87,32 +41,26 @@ function uploadData(){
 		return;
 	}
 
-	var arr;
-	var slideId;
-	try {
-
-		arr = _deconstructSlides(jsonData.chapters[0].slides);
+	try{
+		syncObj.updateStruct(jsonData);
 
 		var chapterOne = jsonData.chapters[0];
 		if(chapterOne){
 			$('#ogURL').val(chapterOne.video.url);
 			$('#title').val(chapterOne.title);
-
 		}
-	} catch (e){
+
+	} catch (e) {
 		console.error(e.message);
 		return;
 	}
 
-	//update Backend data
-	obj = jsonData;
-	slidesArr = arr;
 
 	// update UI Metadata
 	$("#videoUrl").val($("#uploadSyncUrl").val());
 	$("#slideId").val($("#uploadSlideUrl").val());
+	
 	//update UI slides
-
 	try{
 		changeVideo();
 	} catch (e){
@@ -130,25 +78,7 @@ function uploadData(){
 	refreshSlideTable();
 }
 
-function _deconstructSlides(slides){
-	var returnArr = [];
-	var numLoc = 0;
-	if(slides[0]){
-		numLoc = slides[0].url.search(/#\d+/i);
-		numLoc++;
-	}
 
-	for (slide of slides){
-		
-		var val = {
-				"time" : slide.time,
-				"slideNum" : parseInt(slide.url.slice(numLoc),10)
-			};
-
-		returnArr.push(val);
-	}
-	return returnArr;
-}
 
 function refreshSlideTable(){
 
@@ -157,6 +87,9 @@ function refreshSlideTable(){
 
 	var specUrl = slideController.getSlideSpecificUrl();
 	specUrl = "https://speakerd.s3.amazonaws.com/presentations/" + slideController.getSlideId();
+
+	var slidesArr = syncObj.getslideArray();
+
 	for (var i = 0; i < slidesArr.length; i++) {
 	
 		var time = Utility.timeToStr(slidesArr[i].time);
@@ -195,7 +128,7 @@ function updateMetadata(){
 			$('#vidInfoError').append('<li class="list-group-item alert alert-danger">'+ e.message +'</li>');
 		}
 		else{
-			console.error(e.message);
+			console.error(e);
 		}
 	}
 }
@@ -210,12 +143,7 @@ function updateSlideUI(){
 }
 
 function changeName(){
-
-	var title = $("#title").val();
-
-	obj.title = title;
-	obj.chapters[0].title = title;
-
+	syncObj.setTitle($("#title").val());
 }
 
 function changeVideo(){
@@ -233,6 +161,7 @@ function changeVideo(){
 							}
 	try{
 		videoController.changeVideo(newUrl, onerror);
+		syncObj.setVideoUrl(newUrl);
 		jqUrl.parent().removeClass("has-error", "has-feedback");
 	} catch (e){
 		jqUrl.parent().addClass("has-error", "has-feedback");
@@ -294,7 +223,7 @@ function keypressed(event){
 
    } else if(keycode === keyConfig.removeLast){
 
-   	slidesArr.pop();
+   	syncObj.getslideArray().pop();
    	refreshSlideTable();
 
    } else if(keycode === keyConfig.playPause){
@@ -333,18 +262,19 @@ function keypressed(event){
 
 function init()
 {
-   var video = document.getElementById("video");
-   if (FTU){
-   	$('#vidInfoModal').modal('show');
-   	FTU = false;
-   }
-   $(document).unbind('keydown');//removes any previous handlers left over after refresh
-   $(document).keydown(keypressed);
-   clipbrd = new Clipboard('.cp');
+	var video = document.getElementById("video");
+	if (FTU){
+		$('#vidInfoModal').modal('show');
+		FTU = false;
+	}
+	$(document).unbind('keydown');//removes any previous handlers left over after refresh
+	$(document).keydown(keypressed);
+	clipbrd = new Clipboard('.cp');
 
-   videoController = new VideoController('video', window);
-   slideController = new SlideController("slideSet", window);
+	videoController = new VideoController('video', window);
+	slideController = new SlideController("slideSet", window);
   	notificationHandler = new NotificationHandler();
+  	syncObj = new SyncStruct();
 
    slideController.onSlideChange(onSlideChange);
    
